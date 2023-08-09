@@ -35,7 +35,7 @@ public class Target : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     // Destroy when click
@@ -45,9 +45,19 @@ public class Target : MonoBehaviour
         {
             Destroy(gameObject);
             Instantiate(explosion, transform.position, explosion.transform.rotation);
-            
+
             // update score in Game Manager
             gameManager.UpdateScore(pointValue);
+
+            if (gameObject.CompareTag("Bad") && gameManager.lives > 0)
+            {
+                gameManager.UpdateLives(1);
+            }
+
+            if (gameObject.CompareTag("Bad") && gameManager.lives <= 0)
+            {
+                gameManager.GameOver();
+            }
         }
     }
 
@@ -56,17 +66,33 @@ public class Target : MonoBehaviour
     {
         Destroy(gameObject);
 
-        // if tag is not Bad, game over
-        if (!gameObject.CompareTag("Bad"))
+        // if tag is not Bad, game over + lives updating
+        if (!gameObject.CompareTag("Bad") && gameManager.lives > 0)
+        {
+            gameManager.UpdateLives(1);
+        }
+
+        if (!gameObject.CompareTag("Bad") && gameManager.lives <= 0)
         {
             gameManager.GameOver();
+        }
+    }
+
+    public void DestroyTarget()
+    {
+        if (gameManager.isGameActive)
+        {
+            Destroy(gameObject);
+            Instantiate(explosion, transform.position, explosion.transform.rotation);
+            gameManager.UpdateScore(pointValue);
+
         }
     }
     // Randomize force
     private Vector3 RandomForce()
     {
         return Vector3.up * Random.Range(minSpeed, maxSpeed);
-    }    
+    }
 
     // Randomize torque
     private float RandomTorque()
@@ -78,5 +104,5 @@ public class Target : MonoBehaviour
     private Vector3 RandomSpawnPos()
     {
         return new Vector3(Random.Range(-xRange, xRange), ySpawnPos);
-    }    
+    }
 }
